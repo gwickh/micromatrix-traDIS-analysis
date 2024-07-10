@@ -3,23 +3,12 @@
 #date:      :20240704
 #version    :1.0.0
 #desc       :Script to run QuaTraDIS
-#usage		:bash quatradis.sh <directory containing fastq files>
+#usage		:bash quatradis_compare.sh <directory containing fastq files> <reference file>
 #===========================================================================================================
 source "$(sudo find ~ -maxdepth 4 -name conda.sh)" #find path to conda base environment
 
-alert_banner() {
-	echo ""
-	echo "####################################################################################################"
-	echo ""
-	echo "$alert"	
-	echo ""
-	echo "####################################################################################################"
-	echo "" 
-}
-
-
 envpath="$(sudo find ~ -maxdepth 3 -name envs)"
-if [ -f $envpath/bin/quatradis ] 
+if [ -d $envpath/quatradis ] 
 then
 	echo "QuaTraDIS conda env present" 
 else
@@ -31,5 +20,9 @@ else
     conda deactivate
 fi
 
-conda activate quatradis
-tradis --help
+# tradis pipeline compare \
+# 	--output_dir $1/analysis_output \
+# 	--annotations $1/GCA_000006765.1.embl \
+# 	--condition_files cond1.fq.gz cond2.fq.fz \
+# 	--control_files cont1.fq.gz cont2.fq.gz
+# conda deactivate
