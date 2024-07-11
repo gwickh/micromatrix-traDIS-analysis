@@ -13,16 +13,18 @@ then
 	echo "QuaTraDIS conda env present" 
 else
 	echo "creating conda env: quatradis" 
-	conda create -y -n quatradis python=3.11 -c bioconda -c conda-forge
+	conda create -y -n quatradis -c bioconda -c conda-forge
     conda activate quatradis
     mamba install -c conda-forge -c bioconda bioconductor-edger -y
     mamba install -c conda-forge -c bioconda quatradis -y
     conda deactivate
 fi
 
-# tradis pipeline compare \
-# 	--output_dir $1/analysis_output \
-# 	--annotations $1/GCA_000006765.1.embl \
-# 	--condition_files cond1.fq.gz cond2.fq.fz \
-# 	--control_files cont1.fq.gz cont2.fq.gz
-# conda deactivate
+conda activate quatradis
+tradis -V
+tradis pipeline compare \
+	--output_dir $1/analysis_output \
+	--annotations $2 \
+	--condition_files $3/* \
+	--control_files $4/*
+conda deactivate
