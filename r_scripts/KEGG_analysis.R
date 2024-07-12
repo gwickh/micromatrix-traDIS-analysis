@@ -8,6 +8,7 @@ library(pathview)
 library(tidyverse)
 library(egg)
 library(ggbeeswarm)
+library(ggrepel)
 
 # cleanup -----------------------------------------------------------------
 setwd("/Volumes/Research-Groups/Mark-Webber/Gregory_Wickham/Micromatrix_TraDIS/Pathway_analysis/")
@@ -111,17 +112,27 @@ EC_tagless_combined_pathways <- tibble(EC_tagless_combined_significant@result) %
 plot_kegg_scatter <- function(data, species) {
   ggplot(
     data,
-    aes(y = logFC, x = reorder(Description, -logFC, mean), colour = neg_log_pval)
+    aes(y = logFC, x = Description, colour = neg_log_pval)
   )+
-    geom_beeswarm(
-      size = 2,
-      alpha = 0.75,
-      cex = 2
-    )+
     geom_hline(yintercept = 0, size = 0.5) +
+    geom_text_repel(
+      aes(label = gene_name),
+      size = 2.5,
+      position = position_jitter(seed = 1),
+    )+
+    geom_point(
+      size = 1,
+      alpha = 0.5,
+      position = position_jitter(seed = 1),
+    ) +
+    facet_wrap(
+      ~ reorder(Description, -logFC, mean), 
+      ncol = 4,
+      scales = "free_x"
+      ) +
     ggtitle(
       expression("Log"["2"]*" Fold Change of Insertions in Significantly Enriched KEGG Pathways During Co-culture of P. aeruginosa with Faecal Microbiome"))+
-    labs(y = expression("-Log"["2"]*" Fold Change"),
+    labs(y = expression("Log"["2"]*" Fold Change"),
          x = "Enriched KEGG Pathway",
          colour = expression("-log"["10 "]*"Adjusted p-value"))+
     theme_article()+
@@ -134,14 +145,13 @@ plot_kegg_scatter <- function(data, species) {
       panel.grid.major.x = element_line(
         colour="grey", 
         size=0.125),
+      panel.spacing = unit(0, "lines"),
       plot.margin = margin(10, 10, 10, 100),
-      strip.text =  element_text(
-        size = 11, 
-        family = "sans", 
-        colour = "black"))+
+      strip.background = element_blank(),
+      strip.text.x = element_blank()
+      )+
     scale_colour_viridis_c()
 }
-
 map(
   list(PA_combined_pathways),
   ~ plot_kegg_scatter(.x, list("P. aeruginosa"))
