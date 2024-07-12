@@ -36,7 +36,7 @@ for (k in list("PA_combined", "EC_tagged_combined", "EC_tagless_combined")) {
 }
 
 # volcano plot ------------------------------------------------------------
-plot_volcano <- function(data, species) {
+plot_volcano <- function(data) {
   ggplot(data)+
     geom_point(
       aes(x = logFC, y = neg_log_pval),
@@ -62,7 +62,7 @@ plot_volcano <- function(data, species) {
       size = 2.5
     ) +
     facet_wrap(~ insertion) +
-    ggtitle(paste0("Change in Insertions after Co-culture of ", species, " with Faecal Microbiome")) +
+    ggtitle("Change in Insertions after Co-culture with Faecal Microbiome") +
     labs(y = expression("-log"["10 "]*"p-value"),
          x = expression("log"["2"]*" Fold Change")) +
     theme_article() +
@@ -83,5 +83,5 @@ plot_volcano <- function(data, species) {
 
 map(
   list(PA_combined, EC_tagged_combined, EC_tagless_combined),
-  ~ plot_volcano(.x, list("E.coli (tagged)", "E. coli (tagless)", "P. aeruginosa"))
+  ~ plot_volcano(.x)
 )
