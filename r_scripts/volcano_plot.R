@@ -28,8 +28,8 @@ for (k in list("PA_combined", "EC_tagged_combined", "EC_tagless_combined")) {
           ~ ifelse(str_detect(., "^[0-9]"), NA, .)
         ),
         gene_name = coalesce(gene_name, locus_tag),
-        neg_log_pval = -log10(PValue),
-        ori_distance = sqrt(logFC^2 + neg_log_pval^2),
+        neg_log_qval = -log10(q.value),
+        ori_distance = sqrt(logFC^2 + neg_log_qval^2),
         Direction = ifelse(logFC > 0, "Positive", "Negative")
       )
   )
@@ -39,13 +39,13 @@ for (k in list("PA_combined", "EC_tagged_combined", "EC_tagless_combined")) {
 plot_volcano <- function(data) {
   ggplot(data)+
     geom_point(
-      aes(x = logFC, y = neg_log_pval),
+      aes(x = logFC, y = neg_log_qval),
       colour = "grey"
     ) +
     geom_point(data = subset(
       data,
-      (logFC > 2 & PValue < 0.05) | (logFC < -2 & PValue < 0.05)), 
-      aes(x = logFC, y = neg_log_pval, colour = Direction),
+      (logFC > 2 & q.value < 0.05) | (logFC < -2 & q.value < 0.05)), 
+      aes(x = logFC, y = neg_log_qval, colour = Direction),
       alpha = 0.6) +
     geom_hline(yintercept = 1.301) +
     geom_vline(xintercept = 2) +
@@ -53,17 +53,17 @@ plot_volcano <- function(data) {
     geom_label_repel(
       data = subset(
         data,
-        (logFC > 2 & PValue < 0.05) | (logFC < -2 & PValue < 0.05)) %>%
+        (logFC > 2 & q.value < 0.05) | (logFC < -2 & q.value < 0.05)) %>%
         group_by(insertion) %>%
         slice_max(abs(ori_distance), n = 10), 
-      aes(x = logFC, y = neg_log_pval, label = gene_name),
+      aes(x = logFC, y = neg_log_qval, label = gene_name),
       force = 1,
       max.overlaps = Inf,
       size = 2.5
     ) +
     facet_wrap(~ insertion) +
     ggtitle("Change in Insertions after Co-culture with Faecal Microbiome") +
-    labs(y = expression("-log"["10 "]*"p-value"),
+    labs(y = expression("-log"["10 "]*"q-value"),
          x = expression("log"["2"]*" Fold Change")) +
     theme_article() +
     theme(

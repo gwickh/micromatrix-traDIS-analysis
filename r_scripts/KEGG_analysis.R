@@ -34,8 +34,8 @@ for (k in list("PA_combined", "EC_tagged_combined", "EC_tagless_combined")) {
           ~ ifelse(str_detect(., "^[0-9]"), NA, .)
         ),
         gene_name = coalesce(gene_name, locus_tag),
-        neg_log_pval = -log10(PValue),
-        ori_distance = sqrt(logFC^2 + neg_log_pval^2),
+        neg_log_qval = -log10(q.value),
+        ori_distance = sqrt(logFC^2 + neg_log_qval^2),
         Direction = ifelse(logFC > 0, "Positive", "Negative")
       )
   )
@@ -47,7 +47,7 @@ EC_tagless_combined <- left_join(EC_tagless_combined, sequence, by = c("gene_nam
 
 # KEGG --------------------------------------------------------------------
 PA_combined_significant <- PA_combined %>%
-  filter(abs(logFC) > 2 & PValue < 0.01) %>%
+  filter(abs(logFC) > 2 & q.value < 0.01) %>%
   pull(1) %>%
   unique() %>%
   enrichKEGG(
@@ -60,14 +60,14 @@ PA_combined_pathways <- tibble(PA_combined_significant@result) %>%
   mutate(
     Description = str_remove(Description, " - Pseudomonas aeruginosa PAO1")) %>%
   right_join(
-    filter(PA_combined, abs(logFC) > 2 & PValue < 0.01),
+    filter(PA_combined, abs(logFC) > 2 & q.value < 0.01),
     by = c("geneID" = "locus_tag"),
     relationship = "many-to-many",    
   ) %>%
   drop_na()
 
 EC_tagged_combined_significant <- EC_tagged_combined %>%
-  filter(abs(logFC) > 2 & PValue < 0.01) %>%
+  filter(abs(logFC) > 2 & q.value < 0.01) %>%
   pull(-1) %>%
   unique() %>%
   enrichKEGG(
@@ -80,14 +80,14 @@ EC_tagged_combined_pathways <- tibble(EC_tagged_combined_significant@result) %>%
   mutate(
     Description = str_remove(Description, " - Escherichia coli K-12 MG1655")) %>%
   right_join(
-    filter(EC_tagged_combined, abs(logFC) > 2 & PValue < 0.01),
+    filter(EC_tagged_combined, abs(logFC) > 2 & q.value < 0.01),
     by = c("geneID" = "locus_tag"),
     relationship = "many-to-many",    
   ) %>%
   drop_na()
 
 EC_tagless_combined_significant <- EC_tagless_combined %>%
-  filter(abs(logFC) > 2 & PValue < 0.01) %>%
+  filter(abs(logFC) > 2 & q.value < 0.01) %>%
   pull(-1) %>%
   unique() %>%
   enrichKEGG(
@@ -100,7 +100,7 @@ EC_tagless_combined_pathways <- tibble(EC_tagless_combined_significant@result) %
   mutate(
     Description = str_remove(Description, " - Escherichia coli K-12 MG1655")) %>%
   right_join(
-    filter(EC_tagless_combined, abs(logFC) > 2 & PValue < 0.05),
+    filter(EC_tagless_combined, abs(logFC) > 2 & q.value < 0.05),
     by = c("geneID" = "locus_tag"),
     relationship = "many-to-many",    
   ) %>%
@@ -112,7 +112,7 @@ EC_tagless_combined_pathways <- tibble(EC_tagless_combined_significant@result) %
 plot_kegg_scatter <- function(data, species) {
   ggplot(
     data,
-    aes(y = logFC, x = Description, colour = neg_log_pval)
+    aes(y = logFC, x = Description, colour = neg_log_qval)
   )+
     geom_hline(yintercept = 0, size = 0.5) +
     geom_text_repel(
