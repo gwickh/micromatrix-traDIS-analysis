@@ -29,9 +29,12 @@ do
         rm $k/$(basename $k).txt
     fi
     #create text file with plotfile filenames
-    ls -d $k/* > $k/.$(basename $k).txt && mv $k/.$(basename $k).txt $k/$(basename $k).txt
+    ls -d $k/*plot.gz > $k/.$(basename $k).txt && mv $k/.$(basename $k).txt $k/$(basename $k).txt
     #pass filenames to albatradis
+    echo "running albatradis on $k" 
     xargs \
         -a $k/$(basename $k).txt \
         albatradis -a $1
+    #mv output from current dir to working dir 
+    mv ./output $k/ 
 done
