@@ -35,6 +35,11 @@ do
     xargs \
         -a $k/$(basename $k).txt \
         albatradis -a $1
-    #mv output from current dir to working dir 
-    mv ./output $k/ 
+    mv ./output $k/ #mv output from current dir to working dir
+    #prepend dirname to output filenames
+    for j in $k/output/*
+    do 
+        mv $j $(dirname $j)/$(basename $k)_$(basename $j)
+    done  
 done
+conda deactivate
