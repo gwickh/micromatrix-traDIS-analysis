@@ -131,5 +131,4 @@ def plot_volcano(
                 bbox=dict(boxstyle="round,pad=0.3", edgecolor="gray", facecolor="white", alpha=0.7),
                 zorder=1  # Annotations below the data points
             )
-
     plt.show()
