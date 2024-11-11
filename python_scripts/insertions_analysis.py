@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
-from plotting_functions.plot_volcano import plot_volcano
+
+# plotting_functions/__init__.py
+from python_scripts.plotting_functions import plot_volcano
 
 project_path = "~/webber_group/Gregory_Wickham/Micromatrix_TraDIS/TraDIS-Microbiome-240903/reports/"
 tradis_output = pd.read_csv(project_path+"tradis_output.csv")
